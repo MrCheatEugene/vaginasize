@@ -62,6 +62,11 @@ def send_welcome(message):
         elif(lines== 3):
             strLines="полоски"
             linesMeaning = "Что блять."
-        bot.reply_to(message, "У @"+message.from_user.username+" "+str(lines)+" полоски. "+linesMeaning)
+        bot.reply_to(message, "У @"+message.from_user.username+" "+str(lines)+" "+strLines+". "+linesMeaning)
+        linesMeaning= ""
+        strLines = ""
+        size = ""
+        numSize=0
+        isMale =1
     pass
 bot.infinity_polling()
