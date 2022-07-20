@@ -25,7 +25,11 @@ def pairOfDay():
 def nicestOfDay():
     return 'Красавчик дня - '+open("nicestOfDay",'r').readline()+". Поздравляем его!";
 
-
+def getStats(username):
+    if(username in users and len(users[username]) >=5):
+        return 'Настучал символов: '+str(users[username][4])+'\nНаписал сообщений:'+str(users[username][3]);
+    else:
+        return 'Статистика недоступна. Недостаточно данных.'
 
 def updateUsers(fileUsers,users):
     fileUsers.close()
@@ -41,10 +45,12 @@ def updateUsers(fileUsers,users):
 def size(username):
     print("used by "+username)
     userinfo = users.get(username)
+    print(userinfo)
+
     size = ""
     numSize=0
     isMale =1
-    if (isinstance(userinfo,list) == False or len(userinfo) < 2 or (len(userinfo) == 3) and userinfo[0] == 200):
+    if (isinstance(userinfo,list) == False or len(userinfo) < 3 or userinfo[0] == 200 or userinfo[1] == 200 ):
         if(random.randint(1,100)%2 == 0):
             size+="член длинной "
             numSize=random.randint(3,35)
@@ -60,7 +66,7 @@ def size(username):
         users[username].append(numSize)
         users[username].append(200)
         updateUsers(fileUsers,users)
-    elif(isinstance(userinfo,list) and len(userinfo) >=2):
+    elif(isinstance(userinfo,list) and len(userinfo) >=3):
         numSize = userinfo[1]
         isMale = userinfo[0]
         if(isMale == 1):
@@ -93,9 +99,10 @@ def size(username):
 def test(username):
     userinfo = users.get(username)
     lines = 0
-    if (isinstance(userinfo,list) == False or len(userinfo) != 3):
+    if (isinstance(userinfo,list) == False or len(userinfo) < 3):
         lines = random.randint(0,3)
-        users[username]= []
+        if(isinstance(userinfo,list) == False):
+            users[username]= []
         users[username].append(200)
         users[username].append(200)
         users[username].append(lines)
@@ -144,7 +151,8 @@ def query_text(inline_query):
     commandnice = types.InlineQueryResultArticle(str(int(inline_query.id)+random.randint(0,999)),'nicestOfDay',types.InputTextMessageContent(message_text = nicestOfDay()), description = "Красавчик дня")
     commandfool = types.InlineQueryResultArticle(str(int(inline_query.id)+random.randint(0,999)),'foolOfDay',types.InputTextMessageContent(message_text = foolOfDay()), description = "Долбоёб дня")
     commandpair = types.InlineQueryResultArticle(str(int(inline_query.id)+random.randint(0,999)),'pairOfDay',types.InputTextMessageContent(message_text = pairOfDay()), description = "Пара дня")
-    bot.answer_inline_query(inline_query.id, [commandsize,commandtest,commandinfo,commandnice,commandfool,commandpair], cache_time=1)
+    commandstats = types.InlineQueryResultArticle(str(int(inline_query.id)+random.randint(0,999)),'stats',types.InputTextMessageContent(message_text = getStats(inline_query.from_user.username)), description = "Срать подробно")
+    bot.answer_inline_query(inline_query.id, [commandsize,commandtest,commandinfo,commandnice,commandfool,commandpair,commandstats], cache_time=1)
 def default_query(inline_query):
     try:
          if not(inline_query.from_user.username in users):
@@ -157,9 +165,36 @@ def default_query(inline_query):
          commandnice = types.InlineQueryResultArticle(str(int(inline_query.id)+random.randint(0,999)),'nicestOfDay',types.InputTextMessageContent(message_text = nicestOfDay()), description = "Красавчик дня")
          commandfool = types.InlineQueryResultArticle(str(int(inline_query.id)+random.randint(0,999)),'foolOfDay',types.InputTextMessageContent(message_text = foolOfDay()), description = "Долбоёб дня")
          commandpair = types.InlineQueryResultArticle(str(int(inline_query.id)+random.randint(0,999)),'pairOfDay',types.InputTextMessageContent(message_text = pairOfDay()), description = "Пара дня")
-         bot.answer_inline_query(inline_query.id, [commandsize,commandtest,commandinfo,commandnice,commandfool,commandpair], cache_time=1)
+         commandstats = types.InlineQueryResultArticle(str(int(inline_query.id)+random.randint(0,999)),'stats',types.InputTextMessageContent(message_text = getStats(inline_query.from_user.username)), description = "Срать подробно")
+         bot.answer_inline_query(inline_query.id, [commandsize,commandtest,commandinfo,commandnice,commandfool,commandpair,commandstats], cache_time=1)
     except Exception as e:
         print(e)
+
+@bot.message_handler(func=lambda message: True)
+def onmessage(message):
+    if not(message.from_user.username in users):
+        users[message.from_user.username] = "unknown"
+        updateUsers(fileUsers,users)
+        print("NEW USER!")
+
+    if not(isinstance(users[message.from_user.username],list)):
+        users[message.from_user.username] = []
+
+    if(len(users[message.from_user.username]) < 3):
+        while (len(users[message.from_user.username]) <3):
+            users[message.from_user.username].append(200)
+            pass
+    if(len(users[message.from_user.username]) >= 3):
+        if(len(users[message.from_user.username]) >=4):
+            users[message.from_user.username][3] =users[message.from_user.username][3]+1;
+        else:
+            users[message.from_user.username].append(1)
+        if(len(users[message.from_user.username]) >=5):
+            users[message.from_user.username][4] =users[message.from_user.username][4]+len(message.text)
+        else:
+            users[message.from_user.username].append(len(message.text))
+    updateUsers(fileUsers,users)
+
 
 def main_loop():
     bot.infinity_polling()
