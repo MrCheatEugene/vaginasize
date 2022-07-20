@@ -6,39 +6,39 @@ import random
 import telebot
 from telebot import types
 
-API_TOKEN = 'TOKEN'
+API_TOKEN = 'токен'
 
 bot = telebot.TeleBot(API_TOKEN)
 telebot.logger.setLevel(logging.DEBUG)
-fileUsers = open("usersDB.json",'r+')
+fileUsers = open("/test/vagina-bot/usersDB.json",'r+')
 users = json.loads(fileUsers.read())
 
 def info():
     return 'Автор: @Pomorgite\nГитхаб: https://github.com/MrCheatEugene/vaginasize\nДанные обновляются в 00:00 по МСК.\nВнимание!\nБот создан только в развлекательных целях, все данные генерируются случайным образом. \nАвтор не преследует цели кого-то унизить или оскорбить.\nЛюбые совпадения случайны.';
 
 def foolOfDay():
-    return 'Долбоёб дня - '+open("foolOfDay",'r').readline()+". Поздравляем его!";
+    return 'Долбоёб дня - '+open("/test/vagina-bot/foolOfDay",'r').readline()+". Поздравляем его!";
 
 def pairOfDay():
-    return 'Пара дня - '+(open("pairOfDay",'r').readline()).replace("{ANDSIGN}","и")+". Поздравляем их!";
+    return 'Пара дня - '+(open("/test/vagina-bot/pairOfDay",'r').readline()).replace("{ANDSIGN}","и")+". Поздравляем их!";
 
 def nicestOfDay():
-    return 'Красавчик дня - '+open("nicestOfDay",'r').readline()+". Поздравляем его!";
+    return 'Красавчик дня - '+open("/test/vagina-bot/nicestOfDay",'r').readline()+". Поздравляем его!";
 
 def getStats(username):
     if(username in users and len(users[username]) >=5):
-        return 'Настучал символов: '+str(users[username][4])+'\nНаписал сообщений:'+str(users[username][3]);
+        return 'Настучал(а) символов: '+str(users[username][4])+'\nНаписал сообщений:'+str(users[username][3]);
     else:
         return 'Статистика недоступна. Недостаточно данных.'
 
 def updateUsers(fileUsers,users):
     fileUsers.close()
-    os.remove("usersDB.json")
-    os.mknod("usersDB.json")
-    fileUsers = open("usersDB.json",'r+')
+    os.remove("/test/vagina-bot/usersDB.json")
+    os.mknod("/test/vagina-bot/usersDB.json")
+    fileUsers = open("/test/vagina-bot/usersDB.json",'r+')
     fileUsers.write(json.dumps(users))
     fileUsers.close()
-    fileUsers = open("usersDB.json",'r+')
+    fileUsers = open("/test/vagina-bot/usersDB.json",'r+')
     users = json.loads(fileUsers.read())
     return 0
 
