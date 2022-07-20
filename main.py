@@ -126,7 +126,7 @@ def test(username):
     #escapedmsg = str("У @"+username+" "+str(lines)+" "+strLines+". "+linesMeaning).replace("_", "\\_").replace("*", "\\*").replace("[", "\\[").replace("`", "\\`").replace(".", "\\.").replace("(", "\\(").replace(")", "\\)")
     escapedmsg = str("У @"+username+" "+str(lines)+" "+strLines+". "+linesMeaning)
     return escapedmsg
-@bot.message_handler(commands=['size','test','info'])
+@bot.message_handler(commands=['size','test','info','nicestofday','foolofday','pairofday','stats'])
 def send_welcome(message):
     if not(message.from_user.username in users):
         users[message.from_user.username] = "unknown"
@@ -138,6 +138,14 @@ def send_welcome(message):
         bot.reply_to(message, test(message.from_user.username))
     elif(message.content_type == 'text' and message.text=="/info"):
         bot.reply_to(message, info())
+    elif(message.content_type == 'text' and message.text=="/foolofday"):
+        bot.reply_to(message, foolOfDay())
+    elif(message.content_type == 'text' and message.text=="/pairofday"):
+        bot.reply_to(message, pairOfDay())
+    elif(message.content_type == 'text' and message.text=="/nicestofday"):
+        bot.reply_to(message, nicestOfDay())
+    elif(message.content_type == 'text' and message.text=="/stats"):
+        bot.reply_to(message, getStats(message.from_user.username))
 @bot.inline_handler(lambda query: len(query.query) == 0)
 @bot.inline_handler(lambda query: query.query == 'size')
 def query_text(inline_query):
