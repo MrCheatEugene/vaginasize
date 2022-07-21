@@ -1,44 +1,77 @@
 import logging
 import sys
 import time,json,os
+from datetime import datetime
 import random
 
 import telebot
 from telebot import types
 
-API_TOKEN = 'токен'
+#img = Image. open(path_to_image)
+#text = pytesseract. image_to_string(img)
+#print(text)
+API_TOKEN = 'ТОКЕН'
 
 bot = telebot.TeleBot(API_TOKEN)
-telebot.logger.setLevel(logging.DEBUG)
-fileUsers = open("/test/vagina-bot/usersDB.json",'r+')
+#telebot.logger.setLevel(logging.DEBUG)
+fileUsers = open("usersDB.json",'r+')
 users = json.loads(fileUsers.read())
-
+# bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
 def info():
-    return 'Автор: @Pomorgite\nГитхаб: https://github.com/MrCheatEugene/vaginasize\nДанные обновляются в 00:00 по МСК.\nВнимание!\nБот создан только в развлекательных целях, все данные генерируются случайным образом. \nАвтор не преследует цели кого-то унизить или оскорбить.\nЛюбые совпадения случайны.';
+    return 'ВАЖНО! Если ты хочешь, чтобы участники твоего чата были в "долбоёбах,красавчиках и парах" дня, то добавь меня в беседу! Я не буду собирать никакой информации, честно! А тебе и участникам твоего чата смогу предоставить честную статистику.\n\nАвтор: @Pomorgite\nГитхаб: https://github.com/MrCheatEugene/vaginasize\nДанные обновляются в 00:00 по МСК.\nВнимание!\nБот создан только в развлекательных целях, все данные генерируются случайным образом. \nАвтор не преследует цели кого-то унизить или оскорбить.\nЛюбые совпадения случайны.';
 
 def foolOfDay():
-    return 'Долбоёб дня - '+open("/test/vagina-bot/foolOfDay",'r').readline()+". Поздравляем его!";
+    return 'Долбоёб дня - '+open("foolOfDay",'r').readline()+". Поздравляем его!";
 
 def pairOfDay():
-    return 'Пара дня - '+(open("/test/vagina-bot/pairOfDay",'r').readline()).replace("{ANDSIGN}","и")+". Поздравляем их!";
+    return 'Пара дня - '+(open("pairOfDay",'r').readline()).replace("{ANDSIGN}","и")+". Поздравляем их!";
 
 def nicestOfDay():
-    return 'Красавчик дня - '+open("/test/vagina-bot/nicestOfDay",'r').readline()+". Поздравляем его!";
+    return 'Красавчик дня - '+open("nicestOfDay",'r').readline()+". Поздравляем его!";
 
 def getStats(username):
     if(username in users and len(users[username]) >=5):
-        return 'Настучал(а) символов: '+str(users[username][4])+'\nНаписал сообщений:'+str(users[username][3]);
+        updateUsers(fileUsers,users)
+        if(len(users[username]) < 5 or str(users[username][4]) == "NONE"):
+            symbols = 0
+        else:
+            symbols = users[username][4]
+        if(len(users[username]) < 4 or str(users[username][3]) == "NONE"):
+            messages = 0
+        else:
+            messages = users[username][3]
+        if(len(users[username]) < 6 or str(users[username][5]) == "NONE"):
+            photosAmount = 0
+        else:
+            photosAmount = users[username][5]
+        if(len(users[username]) < 7 or str(users[username][6]) == "NONE"):
+            videos = 0
+        else:
+            videos = users[username][6]
+        if(len(users[username]) < 8 or str(users[username][7]) == "NONE"):
+            stickers = 0
+        else:
+            stickers = users[username][7]
+        if(len(users[username]) < 9 or str(users[username][8]) == "NONE"):
+            voice = 0
+        else:
+            voice = users[username][8]
+        if(len(users[username]) < 10 or str(users[username][9]) == "NONE"):
+            audio = 0
+        else:
+            audio = users[username][9]
+        return 'Настучал(а) символов: '+str(symbols)+'\nНаписал(а) сообщений:'+str(messages)+'\nСкинул(а) изображений: '+str(photosAmount)+'\nСкинул(а) видео: '+str(videos)+'\nСкинул(а) стикеров: '+str(stickers)+'\nЗаписал(а) голосовых сообщений: '+str(voice)+'\nСкинул(а) аудиофайлов: '+str(audio)
     else:
         return 'Статистика недоступна. Недостаточно данных.'
 
 def updateUsers(fileUsers,users):
     fileUsers.close()
-    os.remove("/test/vagina-bot/usersDB.json")
-    os.mknod("/test/vagina-bot/usersDB.json")
-    fileUsers = open("/test/vagina-bot/usersDB.json",'r+')
+    os.remove("usersDB.json")
+    os.mknod("usersDB.json")
+    fileUsers = open("usersDB.json",'r+')
     fileUsers.write(json.dumps(users))
     fileUsers.close()
-    fileUsers = open("/test/vagina-bot/usersDB.json",'r+')
+    fileUsers = open("usersDB.json",'r+')
     users = json.loads(fileUsers.read())
     return 0
 
@@ -184,7 +217,7 @@ def onmessage(message):
         users[message.from_user.username] = "unknown"
         updateUsers(fileUsers,users)
         print("NEW USER!")
-
+    print(message.content_type)
     if not(isinstance(users[message.from_user.username],list)):
         users[message.from_user.username] = []
 
@@ -193,16 +226,90 @@ def onmessage(message):
             users[message.from_user.username].append(200)
             pass
     if(len(users[message.from_user.username]) >= 3):
-        if(len(users[message.from_user.username]) >=4):
+        if(len(users[message.from_user.username]) >=4 and users[message.from_user.username][3]!= "NONE"):
             users[message.from_user.username][3] =users[message.from_user.username][3]+1;
         else:
             users[message.from_user.username].append(1)
-        if(len(users[message.from_user.username]) >=5):
+        if(len(users[message.from_user.username]) >=5 and message.content_type == 'text' and users[message.from_user.username][4]!= "NONE"):
             users[message.from_user.username][4] =users[message.from_user.username][4]+len(message.text)
-        else:
+        elif(message.content_type == 'text'):
             users[message.from_user.username].append(len(message.text))
     updateUsers(fileUsers,users)
 
+@bot.message_handler(func=lambda message: True,content_types =['photo'] )
+def processPhotos(message):
+    if(len(users[message.from_user.username]) < 3):
+        while (len(users[message.from_user.username]) <3):
+            users[message.from_user.username].append(200)
+            pass
+    if(len(users[message.from_user.username]) >= 6 and users[message.from_user.username][5]!= "NONE"):
+        users[message.from_user.username][5] = users[message.from_user.username][5]+1;
+        updateUsers(fileUsers,users);
+    elif(len(users[message.from_user.username]) < 6):
+        while(len(users[message.from_user.username]) < 7):
+            users[message.from_user.username].append(0)
+        users[message.from_user.username].append(1)
+        updateUsers(fileUsers,users);
+@bot.message_handler(func=lambda message: True,content_types =['sticker'] )
+def processStickers(message):
+    if(len(users[message.from_user.username]) < 3):
+        while (len(users[message.from_user.username]) <3):
+            users[message.from_user.username].append(200)
+            pass
+    if(len(users[message.from_user.username]) >= 8 and users[message.from_user.username][7]!= "NONE" ):
+        users[message.from_user.username][7] = users[message.from_user.username][7]+1;
+        updateUsers(fileUsers,users);
+    elif(len(users[message.from_user.username]) < 8):
+        while(len(users[message.from_user.username]) < 7):
+            users[message.from_user.username].append(0)
+        users[message.from_user.username].append(1)
+        updateUsers(fileUsers,users);
+
+@bot.message_handler(func=lambda message: True,content_types =['voice'] )
+def processVoice(message):
+    if(len(users[message.from_user.username]) < 3):
+        while (len(users[message.from_user.username]) <3):
+            users[message.from_user.username].append(200)
+            pass
+    if(len(users[message.from_user.username]) >= 9 and users[message.from_user.username][8]!= "NONE"):
+        users[message.from_user.username][8] = users[message.from_user.username][8]+1;
+        updateUsers(fileUsers,users);
+    elif(len(users[message.from_user.username]) < 9):
+        while(len(users[message.from_user.username]) < 8):
+            users[message.from_user.username].append(0)
+        users[message.from_user.username].append(1)
+        updateUsers(fileUsers,users);
+
+@bot.message_handler(func=lambda message: True,content_types =['audio'] )
+def processMusic(message):
+    if(len(users[message.from_user.username]) < 3):
+        while (len(users[message.from_user.username]) <3):
+            users[message.from_user.username].append(200)
+            pass
+    if(len(users[message.from_user.username]) >= 10 and users[message.from_user.username][9]!= "NONE"):
+        users[message.from_user.username][9] = users[message.from_user.username][9]+1;
+        updateUsers(fileUsers,users);
+    elif(len(users[message.from_user.username]) < 10):
+        while(len(users[message.from_user.username]) < 9):
+            users[message.from_user.username].append(0)
+        users[message.from_user.username].append(1)
+        updateUsers(fileUsers,users);
+
+
+@bot.message_handler(func=lambda message: True,content_types =['video','video_note'] )
+def processVideos(message):
+    if(len(users[message.from_user.username]) < 3):
+        while (len(users[message.from_user.username]) <3):
+            users[message.from_user.username].append(200)
+            pass
+    if(len(users[message.from_user.username]) >= 7 and users[message.from_user.username][6]!= "NONE"):
+        users[message.from_user.username][6] = users[message.from_user.username][6]+1;
+        updateUsers(fileUsers,users);
+    elif(len(users[message.from_user.username]) < 7):
+        while(len(users[message.from_user.username]) < 6):
+            users[message.from_user.username].append(0)
+        users[message.from_user.username].append(1)
+        updateUsers(fileUsers,users);
 
 def main_loop():
     bot.infinity_polling()
